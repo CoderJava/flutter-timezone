@@ -22,50 +22,7 @@ class SetTimezonePage extends StatelessWidget {
         ),
         builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
           if (snapshot.hasData) {
-            var timezoneModel = TimezoneModel.fromJson(snapshot.data.data);
-            var listTimezones = timezoneModel.listTimezones;
-            return ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: listTimezones.length,
-              separatorBuilder: (context, index) {
-                return Divider();
-              },
-              itemBuilder: (context, index) {
-                var itemTimezone = listTimezones[index];
-                var symbol = itemTimezone.gmtOffset >= 0 ? '+' : '-';
-                var hour = itemTimezone.gmtOffset ~/ 3600;
-                var minute = (itemTimezone.gmtOffset % 3600) ~/ 60;
-                var strHour = hour.abs().toString().padLeft(2, '0');
-                var strMinute = minute.abs().toString().padLeft(2, '0');
-                var strGmtOffset = 'GMT$symbol$strHour:$strMinute';
-                return GestureDetector(
-                  onTap: () => Navigator.pop(
-                    context,
-                    {
-                      'timezone': itemTimezone.zoneName,
-                      'gmt_offset': strGmtOffset,
-                    },
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        itemTimezone.countryName,
-                        style: Theme.of(context).textTheme.subtitle2,
-                      ),
-                      Text(
-                        itemTimezone.zoneName,
-                        style: Theme.of(context).textTheme.caption,
-                      ),
-                      Text(
-                        strGmtOffset,
-                        style: Theme.of(context).textTheme.caption,
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
+            return WidgetContentTimezone(snapshot.data);
           } else if (snapshot.hasError) {
             return Center(
               child: Text('Error: ${snapshot.error}'),
@@ -77,6 +34,106 @@ class SetTimezonePage extends StatelessWidget {
           }
         },
       ),
+    );
+  }
+}
+
+class WidgetContentTimezone extends StatefulWidget {
+  final Response data;
+
+  WidgetContentTimezone(this.data);
+
+  @override
+  _WidgetContentTimezoneState createState() => _WidgetContentTimezoneState();
+}
+
+class _WidgetContentTimezoneState extends State<WidgetContentTimezone> {
+  TimezoneModel timezoneModel;
+  var listTimezones = <ItemTimezone>[];
+  var listResult = <ItemTimezone>[];
+
+  @override
+  void initState() {
+    timezoneModel = TimezoneModel.fromJson(widget.data.data);
+    listTimezones = timezoneModel.listTimezones;
+    listResult.addAll(listTimezones);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(
+            left: 16,
+            top: 16,
+            right: 16,
+          ),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Search',
+            ),
+            textInputAction: TextInputAction.search,
+            onSubmitted: (value) {
+              listResult.clear();
+              if (value.isEmpty) {
+                listResult.addAll(listTimezones);
+              } else {
+                var result = listTimezones.where((element) {
+                  return element.countryName.toLowerCase().contains(value.toLowerCase());
+                });
+                listResult.addAll(result);
+              }
+              setState(() {});
+            },
+          ),
+        ),
+        Expanded(
+          child: ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: listResult.length,
+            separatorBuilder: (context, index) {
+              return Divider();
+            },
+            itemBuilder: (context, index) {
+              var itemTimezone = listResult[index];
+              var symbol = itemTimezone.gmtOffset >= 0 ? '+' : '-';
+              var hour = itemTimezone.gmtOffset ~/ 3600;
+              var minute = (itemTimezone.gmtOffset % 3600) ~/ 60;
+              var strHour = hour.abs().toString().padLeft(2, '0');
+              var strMinute = minute.abs().toString().padLeft(2, '0');
+              var strGmtOffset = 'GMT$symbol$strHour:$strMinute';
+              return GestureDetector(
+                onTap: () => Navigator.pop(
+                  context,
+                  {
+                    'timezone': itemTimezone.zoneName,
+                    'gmt_offset': strGmtOffset,
+                  },
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      itemTimezone.countryName,
+                      style: Theme.of(context).textTheme.subtitle2,
+                    ),
+                    Text(
+                      itemTimezone.zoneName,
+                      style: Theme.of(context).textTheme.caption,
+                    ),
+                    Text(
+                      strGmtOffset,
+                      style: Theme.of(context).textTheme.caption,
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
