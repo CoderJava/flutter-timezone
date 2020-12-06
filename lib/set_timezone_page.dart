@@ -16,7 +16,7 @@ class SetTimezonePage extends StatelessWidget {
         future: dio.get(
           'https://api.timezonedb.com/v2.1/list-time-zone',
           queryParameters: {
-            'key': '0H7MVMVXW690',
+            'key': '<API_KEY>',
             'format': 'json',
           },
         ),
