@@ -27,10 +27,10 @@ class HomeApp extends StatefulWidget {
 class _HomeAppState extends State<HomeApp> {
   final methodChannel = MethodChannel('sample_time_zone_flutter_channel');
 
-  int eventTimeInMillis = 0;
-  String strEventTime = 'No Event';
-  String timezone = '';
-  String strGmtOffset = '';
+  var eventTimeInMillis = 0;
+  var strEventTime = 'No Event';
+  var timezone = '';
+  var strGmtOffset = '';
   tz.Location timezoneLocation;
 
   @override
@@ -90,7 +90,7 @@ class _HomeAppState extends State<HomeApp> {
                     timezone = resultSetTimezone['timezone'] as String;
                     timezoneLocation = tz.getLocation(timezone);
                     strGmtOffset = resultSetTimezone['gmt_offset'] as String;
-                    if (eventTimeInMillis != null) {
+                    if (eventTimeInMillis != 0) {
                       var eventTime = tz.TZDateTime.fromMillisecondsSinceEpoch(timezoneLocation, eventTimeInMillis);
                       strEventTime = DateFormat('dd MMM yyyy HH:mm').format(eventTime);
                     }
@@ -105,7 +105,7 @@ class _HomeAppState extends State<HomeApp> {
                   var resultSetEvent = await showTimePicker(
                     context: context,
                     initialTime: eventTimeInMillis == 0
-                        ? TimeOfDay.now()
+                        ? TimeOfDay.fromDateTime(tz.TZDateTime.now(timezoneLocation))
                         : TimeOfDay.fromDateTime(
                             tz.TZDateTime.fromMillisecondsSinceEpoch(timezoneLocation, eventTimeInMillis),
                           ),
