@@ -25,7 +25,7 @@ class HomeApp extends StatefulWidget {
 }
 
 class _HomeAppState extends State<HomeApp> {
-  final methodChannelHelper = MethodChannel('sample_time_zone_flutter_channel');
+  final methodChannel = MethodChannel('sample_time_zone_flutter_channel');
 
   int eventTimeInMillis = 0;
   String strEventTime = 'No Event';
@@ -36,7 +36,7 @@ class _HomeAppState extends State<HomeApp> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      var timezoneNative = await methodChannelHelper.invokeMethod('get_native_time_zone');
+      var timezoneNative = await methodChannel.invokeMethod('get_native_time_zone');
       timezone = timezoneNative['timezone'] as String;
       timezoneLocation = tz.getLocation(timezone);
       var gmtOffset = timezoneNative['gmt_offset'] as int;
