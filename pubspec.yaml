@@ -11,17 +11,17 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.0
-  timezone: any
-  dio: any
-  intl: any
+  timezone: ^0.5.9
+  dio: ^3.0.10
+  intl: ^0.16.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  json_annotation: any
-  json_serializable: any
-  build_runner: any
+  json_annotation: ^3.1.1
+  json_serializable: ^3.5.1
+  build_runner: ^1.10.7
 
 flutter:
   uses-material-design: true
